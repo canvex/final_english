@@ -45,4 +45,27 @@ public class p2 : MonoBehaviour
     {
         SceneManager.LoadScene("SampleScene");
     }
+
+    public class playerState
+    {
+        public string name;
+        public int level;
+        public Vector3 pos;
+    }
+    public void save()
+    {
+        //填寫playerState格式的資料..
+        playerState myPlayer = new playerState();
+        myPlayer.name = "sammaru";
+        myPlayer.level = 87;
+        myPlayer.pos = GameObject.Find("sammaru").transform.position;
+
+        //將myPlayer轉換成json格式的字串
+        string saveString = JsonUtility.ToJson(myPlayer);
+
+        //將字串saveString存到硬碟中
+        StreamWriter file = new StreamWriter(System.IO.Path.Combine(Application.streamingAssetsPath, "myPlayer"));
+        file.Write(saveString);
+        file.Close();
+    }
 }
