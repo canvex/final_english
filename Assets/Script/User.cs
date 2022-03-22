@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Assets;
+using System;
 using UnityEngine.UI;
 using System.Data;
 using UnityEngine.SceneManagement;
@@ -15,20 +16,36 @@ public class User : MonoBehaviour
     public Text info;
     SqlAccess sql;
 
-    public bool isSpace(InputField inputField){
-        if(inputField.text.Length !=0){
+    public bool isSpace(InputField inputField)
+    {
+        if (inputField.text.Length != 0)
+        {
             return true;
         }
-            return false;
+        return false;
     }
-     public void register(){
-        sql= new SqlAccess();
-        if(isSpace(username)&&isSpace(password)&&isSpace(email)){
-            DataSet ds=sql.InsertInto("user",new string[]{"username","password","email"},new string[]{username.text,password.text,email.text});
-            loginMsg.text="註冊成功";
-        }else{
-            loginMsg.text="帳密不能為空值";
+    public void register()
+    {
+        string regDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        sql = new SqlAccess();
+        DataSet ds = sql.QuerySet("Select * from user where username ='" + username.text +"'");
+        DataTable table = ds.Tables[0];
+        if (table.Rows.Count == 0)
+        {
+            if (isSpace(username) && isSpace(password) && isSpace(email))
+            {
+                sql.InsertInto("user", new string[] { "username", "password", "email", "createTime" }, new string[] { username.text, password.text, email.text, regDate });
+                loginMsg.text = "註冊成功";
+            }
+            else
+            {
+                loginMsg.text = "帳密不能為空值";
+            }
         }
+        else{
+            loginMsg.text="此帳號已經使用過，請換一個!";
+        }
+
         sql.Close();
     }
 
@@ -38,7 +55,6 @@ public class User : MonoBehaviour
         if (username.text != null && password.text != null)
         {
             DataSet ds = sql.QuerySet("Select id from user where username ='" + username.text + "' and password ='" + password.text + "'");
-
             DataTable table = ds.Tables[0];
             foreach (DataRow dataRow in table.Rows)
             {
@@ -51,6 +67,7 @@ public class User : MonoBehaviour
             if (table.Rows.Count > 0)
             {
                 loginMsg.text = "歡迎" + username.text + "登入";
+                SceneManager.LoadScene("2");
             }
             else
             {
@@ -71,7 +88,9 @@ public class User : MonoBehaviour
     }
     public void btn()
     {
-        loginMsg.text = "一切準備就緒!!";
+        string Date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        //Console.WriteLine("The Current Date Without Time is {0}.", Date);
+        loginMsg.text = Date;
 
     }
 
