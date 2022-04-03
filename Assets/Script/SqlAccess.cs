@@ -13,9 +13,9 @@ namespace Assets
     {
         public static MySqlConnection mySqlConnection;//連線類物件
         private static string database = "english";
-        private static string host = "XXX.XXX.XXX.XXX";
-        private static string username = "abc";
-        private static string password = "abc";
+        private static string host = "152.70.110.2";
+        private static string username = "english";
+        private static string password = "@bcd1234";
 
         public SqlAccess()
         {

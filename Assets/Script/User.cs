@@ -16,6 +16,10 @@ public class User : MonoBehaviour
     public Text info;
     SqlAccess sql;
 
+    void Start()
+    {
+        checkLogin();
+    }
     public bool isSpace(InputField inputField)
     {
         if (inputField.text.Length != 0)
@@ -28,7 +32,7 @@ public class User : MonoBehaviour
     {
         string regDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         sql = new SqlAccess();
-        DataSet ds = sql.QuerySet("Select * from user where username ='" + username.text +"'");
+        DataSet ds = sql.QuerySet("Select * from user where username ='" + username.text + "'");
         DataTable table = ds.Tables[0];
         if (table.Rows.Count == 0)
         {
@@ -42,8 +46,9 @@ public class User : MonoBehaviour
                 loginMsg.text = "帳密不能為空值";
             }
         }
-        else{
-            loginMsg.text="此帳號已經使用過，請換一個!";
+        else
+        {
+            loginMsg.text = "此帳號已經使用過，請換一個!";
         }
 
         sql.Close();
@@ -62,12 +67,17 @@ public class User : MonoBehaviour
                 {
                     Debug.Log("登入ID:" + dataRow[dataColumn]);
                     info.text = "你的ID為: " + dataRow[dataColumn];
+
+                    int userid=Int32.Parse(dataRow[dataColumn].ToString());
+                    PlayerPrefs.SetInt("ID", userid);
+                    PlayerPrefs.SetString("username", username.text);
                 }
             }
             if (table.Rows.Count > 0)
             {
+
                 loginMsg.text = "歡迎" + username.text + "登入";
-                SceneManager.LoadScene("2");
+                SceneManager.LoadScene("logintest");
             }
             else
             {
@@ -92,6 +102,16 @@ public class User : MonoBehaviour
         //Console.WriteLine("The Current Date Without Time is {0}.", Date);
         loginMsg.text = Date;
 
+    }
+    private void checkLogin(){
+        if( PlayerPrefs.GetInt("ID")!=0 && PlayerPrefs.GetString("username")!=null){
+            SceneManager.LoadScene("logintest");
+        }
+        else{
+            loginMsg.text="請先登入";
+        }
+        // int nInt = PlayerPrefs.GetInt("ID");
+        // string sString = PlayerPrefs.GetString("username");
     }
 
 
