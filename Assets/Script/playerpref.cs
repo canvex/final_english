@@ -8,26 +8,54 @@ public class playerpref : MonoBehaviour
     public InputField test;
     public Text Text;
     UnityWebRequest w_Texture;
+    UnityWebRequest default_avatar_Texture;//取預設大頭貼
+    UnityWebRequest avatar_Texture;//取用戶的大頭貼
     public RawImage image;
-    private void Update() {
-        if(Input.GetKeyDown(KeyCode.A)){
+    public RawImage avatar;
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.A))
+        {
             StartCoroutine(Start());
         }
     }
+
     IEnumerator Start()
     {
-        w_Texture=UnityWebRequestTexture.GetTexture("http://english.tk888.me/baha.png");
+        //==============取用戶大頭貼==============
+        int nInt = PlayerPrefs.GetInt("ID");
+        avatar_Texture = UnityWebRequestTexture.GetTexture("http://english.tk888.me/avatar/" + nInt.ToString() + ".png");
+        default_avatar_Texture = UnityWebRequestTexture.GetTexture("http://english.tk888.me/avatar/default.png");
+
+        yield return avatar_Texture.SendWebRequest();
+        yield return default_avatar_Texture.SendWebRequest();
+
+        if (avatar_Texture.isNetworkError || avatar_Texture.isHttpError)
+        {
+            avatar.texture = DownloadHandlerTexture.GetContent(default_avatar_Texture);
+            avatar.SetNativeSize();
+            //Debug.Log(avatar_Texture.error);
+        }
+        else
+        {
+            avatar.texture = DownloadHandlerTexture.GetContent(avatar_Texture);
+            avatar.SetNativeSize();
+        }
+        //==============取活動貼圖，可以更改(目前無用處)==============
+        w_Texture = UnityWebRequestTexture.GetTexture("http://english.tk888.me/baha.png");
         yield return w_Texture.SendWebRequest();
 
-        if(w_Texture.isNetworkError || w_Texture.isHttpError){
+        if (w_Texture.isNetworkError || w_Texture.isHttpError)
+        {
             Debug.Log(w_Texture.error);
         }
-        else{
-            image.texture=DownloadHandlerTexture.GetContent(w_Texture);
+        else
+        {
+            image.texture = DownloadHandlerTexture.GetContent(w_Texture);
             image.SetNativeSize();
         }
-        // Load();
-        //StartCoroutine(Download_File());
+        // // Load();
+        // //StartCoroutine(Download_File());
     }
 
     IEnumerator Download_File()
@@ -63,4 +91,23 @@ public class playerpref : MonoBehaviour
     {
         PlayerPrefs.DeleteAll();
     }
+    public IEnumerator profile()
+    {
+        int nInt = PlayerPrefs.GetInt("ID");
+        default_avatar_Texture = UnityWebRequestTexture.GetTexture("http://english.tk888.me/avatar/default.png");
+        avatar_Texture = UnityWebRequestTexture.GetTexture("http://english.tk888.me/avatar/" + nInt.ToString() + ".png");
+        yield return avatar_Texture.SendWebRequest();
+        if (avatar_Texture.error == "404")
+        {
+            avatar.texture = DownloadHandlerTexture.GetContent(default_avatar_Texture);
+            avatar.SetNativeSize();
+            //Debug.Log(avatar_Texture.error);
+        }
+        else
+        {
+            avatar.texture = DownloadHandlerTexture.GetContent(avatar_Texture);
+            avatar.SetNativeSize();
+        }
+    }
+
 }

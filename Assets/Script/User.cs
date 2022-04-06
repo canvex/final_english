@@ -86,6 +86,9 @@ public class User : MonoBehaviour
         }
         sql.Close();
     }
+    public void t1(){
+        
+    }
 
     public void nextScene()
     {
